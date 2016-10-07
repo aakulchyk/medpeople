@@ -71,8 +71,28 @@ def main():
         print('Error: missing PDF filename argument!')
 
 
+from threading import Thread
 
-if __name__ == '__main__':
-    main()
+
+
+class OcrThread(Thread):
+
+    def __init__(self, pdflist):
+        Thread.__init__(self)
+        self.pdflist = pdflist
+
+    def run(self):
+        while self.pdflist:
+            pdf_file = self.pdflist.pop(0)
+            print(pdf_file)
+            recognized_text = pdf_ocr(pdf_file)
+            f = open(pdf_file + '.text', 'w')
+            f.write(recognized_text)
+            f.close
+        print('All files OCR\'d')
+
+            
+#if __name__ == '__main__':
+#    main()
 
 
