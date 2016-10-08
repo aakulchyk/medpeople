@@ -14,7 +14,7 @@ import io
 def pdf_ocr(pdf_filename):
 
     # TEMP!
-    return u'PSEUDO-RECOGNIZED TEXT'
+    #return u'PSEUDO-RECOGNIZED TEXT'
 
     tool = pyocr.get_available_tools()[0]
 
@@ -62,7 +62,7 @@ def main():
         if pdf_filename[-4:].lower() == '.pdf':
             recognized_text = pdf_ocr(pdf_filename)
             f = open(pdf_filename + '.text', 'w')
-            f.write(recognized_text)
+            f.write('\n'.join(recognized_text))
             f.close
         else:
             print('Not PDF document!')
@@ -87,7 +87,7 @@ class OcrThread(Thread):
             print(pdf_file)
             recognized_text = pdf_ocr(pdf_file)
             f = open(pdf_file + '.text', 'w')
-            f.write(recognized_text)
+            f.write('\n'.join(recognized_text))
             f.close
         print('All files OCR\'d')
 
