@@ -73,7 +73,7 @@ def main():
 
 from threading import Thread
 
-
+from .models import Attachment
 
 class OcrThread(Thread):
 
@@ -89,6 +89,10 @@ class OcrThread(Thread):
             f = open(pdf_file + '.text', 'w')
             f.write('\n'.join(recognized_text))
             f.close
+            #put text to DB
+            obj = Attachment.objects.get(file_attached=pdf_file)
+            obj.all_content = recognized_text
+            obj.save()
         print('All files OCR\'d')
 
             
