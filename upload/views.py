@@ -12,23 +12,19 @@ from django.http import FileResponse
 
 pending_pdfs_list = []
 
-def done(self):
+def done(request):
     l = pending_pdfs_list[:]
     print('list!' + str(l))
     ocrThread = OcrThread(pending_pdfs_list)
-    ocrThread.start()    
-    return HttpResponse(','.join(l) + 'Uploaded and started to process!')
+    ocrThread.start()
+    
+    template_name = 'done.html'
+    initial = {'file_list_string' : ','.join(l)}    
+    return render(request, template_name, initial)
     
 def pdf_view(request, document_id):
-    print('PDF_ViEW!!!!!   ')
     return FileResponse(open(document_id, 'rb'), content_type='application/pdf')
-    '''
-    with open(document_id, 'r') as pdf:
-        response = HttpResponse(pdf.read(), mimetype='application/pdf')
-        response['Content-Disposition'] = 'inline;filename=some_file.pdf'
-        return response
-    pdf.closed
-    '''
+
 class UploadView(FormView):
     template_name = 'form.html'
     form_class = UploadForm

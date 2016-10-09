@@ -41,8 +41,6 @@ def pdf_ocr(pdf_filename):
         img_page = Image(image=img)
         req_image.append(img_page.make_blob('jpeg'))
 
-    #f = open('recognized.txt', 'w')
-
     for idx, img in enumerate(req_image): 
         print('OCR page %d' % idx)
         txt = tool.image_to_string(
@@ -51,9 +49,7 @@ def pdf_ocr(pdf_filename):
             builder=pyocr.builders.TextBuilder()
         )
         final_text.append(txt)
-        #f.write(txt)
-    #f.close()
-
+    
     return final_text
 
 def main():
