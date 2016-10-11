@@ -1,0 +1,10 @@
+<h2>{{"Done!"}}</h2>
+{% if file_list_string %}
+    <p>{{ file_list_string }} are uploaded and about to be processed.</p>
+{% else %}
+    <p>No new files uploaded</p>
+{% endif %}
+<br>
+<form action="{% url 'upload:index' %}">
+    <input type="submit" value="Return to index"/>
+</form>
