@@ -4,9 +4,9 @@ from .models import Attachment
 from django.shortcuts import render
 from django.urls import reverse
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 
-from .ocrtest import OcrThread
+from .ocrtest import OcrThread, ReindexThread
 
 from django.http import FileResponse
 
@@ -25,6 +25,11 @@ def done(request):
 def pdf_view(request, document_id):
     return FileResponse(open(document_id, 'rb'), content_type='application/pdf')
 
+def reindex_files(request):
+    reindexThread = ReindexThread()
+    reindexThread.start()
+    return HttpResponseRedirect(reverse('upload:index'));
+    
 class UploadView(FormView):
     template_name = 'form.html'
     form_class = UploadForm

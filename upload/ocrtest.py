@@ -11,8 +11,8 @@ from PIL import Image as PI
 import pyocr
 import pyocr.builders
 import io	
-def pdf_ocr(pdf_filename):
 
+def pdf_ocr(pdf_filename):
     # TEMP!
     #return u'PSEUDO-RECOGNIZED TEXT'
 
@@ -52,27 +52,13 @@ def pdf_ocr(pdf_filename):
     
     return final_text
 
-def main():
-    if len(sys.argv) >=2:
-        pdf_filename = sys.argv[1]
-        if pdf_filename[-4:].lower() == '.pdf':
-            recognized_text = pdf_ocr(pdf_filename)
-            f = open(pdf_filename + '.text', 'w')
-            f.write('\n'.join(recognized_text))
-            f.close
-        else:
-            print('Not PDF document!')
-
-    else:
-        print('Error: missing PDF filename argument!')
 
 
 from threading import Thread
 
 from .models import Attachment
-
+import re
 class OcrThread(Thread):
-
     def __init__(self, pdflist):
         Thread.__init__(self)
         self.pdflist = pdflist
@@ -83,15 +69,36 @@ class OcrThread(Thread):
             print(pdf_file)
             recognized_text = pdf_ocr(pdf_file)
             f = open(pdf_file + '.text', 'w')
-            f.write('\n'.join(recognized_text))
-            f.close
+            text = ''.join(recognized_text)
+            words = re.findall(u'(.+)', text)
+            newtext = '\n'.join(words)
+            f.write(newtext)
+            f.close()
             #put text to DB
             obj = Attachment.objects.get(file_attached=pdf_file)
-            obj.all_content = recognized_text
+            obj.all_content = newtext
             obj.save()
         print('All files OCR\'d')
 
-            
+from dictionary.models import MedicalTerm
+
+class ReindexThread(Thread):
+    def run(self):
+        documents = Attachment.objects.all()
+        
+        for doc in documents:
+            print(doc.file_attached)
+            for line in doc.all_content.split('\n'):
+                #print(line)
+                for word in line.split(' '):
+                    #print(word)
+                    
+                    if MedicalTerm.objects.filter(name=word.strip()):
+                        term = MedicalTerm.objects.get(name=word.strip())
+                        print('===Word found! ---> %s %s' % (word, term) )
+                        doc.tags.add(term)
+                        doc.save()
+        print('finished')
 #if __name__ == '__main__':
 #    main()
 
