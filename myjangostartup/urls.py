@@ -20,7 +20,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^polls/',include('polls.urls')),
     url(r'^upload/',include('upload.urls')),
-    #url(r'^dictionary/',include('dictionary.urls')),
-    
+    url(r'^dictionary/',include('dictionary.urls')),
 ]
 
