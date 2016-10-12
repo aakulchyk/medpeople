@@ -1,0 +1,5 @@
+<div>Put the dictionary file to proper directory and press 'Fill dictionary'</div>
+<form action = {% url 'dictionary:fill' %} method="post" >
+    {% csrf_token %}
+    <input type="submit" value="Fill dictionary"/>
+</form>
