@@ -8,6 +8,6 @@ def fill(request):
 	return HttpResponse('Done!')
 
 def dict_index(request):
-	template_name = 'form.html'
+	template_name = 'dictionary/form.html'
 	return render(request, template_name)
 # Create your views here.
