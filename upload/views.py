@@ -18,7 +18,7 @@ def done(request):
     ocrThread = OcrThread(pending_pdfs_list)
     ocrThread.start()
     
-    template_name = 'done.html'
+    template_name = 'upload/done.html'
     initial = {'file_list_string' : ','.join(l)}    
     return render(request, template_name, initial)
     
@@ -31,7 +31,7 @@ def reindex_files(request):
     return HttpResponseRedirect(reverse('upload:index'));
     
 class UploadView(FormView):
-    template_name = 'form.html'
+    template_name = 'upload/form.html'
     form_class = UploadForm
     success_url = 'done/'
     
