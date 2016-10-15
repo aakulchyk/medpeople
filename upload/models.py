@@ -12,7 +12,8 @@ class Attachment(models.Model):
     
     def __str__(self):
         # str(self.file_attached).split('/')[-1]
-        return u'%s : %s' % (str(self.visit_date), ' '.join(sorted([x.name for x in self.tags.all()])[:20] ))
+        tags = ' '.join(sorted(['['+x.name+']' for x in self.tags.all()])[:20])
+        return u'%s : %s' % (str(self.visit_date), tags if tags else u'Текст не распознан :(' )
 
     
 

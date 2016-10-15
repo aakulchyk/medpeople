@@ -59,6 +59,8 @@ from threading import Thread
 from .models import Attachment
 import re
 
+from .analyze import AnalyzeThread
+
 class OcrThread(Thread):
     def __init__(self, pdflist):
         Thread.__init__(self)
@@ -79,4 +81,7 @@ class OcrThread(Thread):
             obj = Attachment.objects.get(file_attached=pdf_file)
             obj.all_content = newtext
             obj.save()
+            analyzeThread = AnalyzeThread(pdf_file)
+            analyzeThread.start()
         print('All files OCR\'d')
+        

@@ -13,17 +13,24 @@ class AnalyzeThread(Thread):
     morph = pymorphy2.MorphAnalyzer()
     tags_added = 0
     
-    def run(self):
-        attachments = Attachment.objects.all();
-        for doc in attachments:
-            print(doc.file_attached)
-            self.analyze_document(doc)
-        print('%d documents analyzed. %d new tags added.' % (len(attachments), self.tags_added))
+    def __init__(self, document):
+        Thread.__init__(self)
+        self.document = document
     
+    def run(self):
+        if self.document:
+            self.analyze_document(Attachment.objects.get(file_attached = self.document))
+        else:
+            attachments = Attachment.objects.all();
+            for doc in attachments:
+                self.analyze_document(doc)
     
     def analyze_document(self, doc):
+        self.tags_added = 0
+        print('started analysis of document %s' % doc)
         for line in doc.all_content.split('\n'):
             self.analyze_line(doc, line)
+        print('document %s is analyzed. %d new tags added.' % (doc, self.tags_added))
         
     
     def analyze_line(self, doc, line):

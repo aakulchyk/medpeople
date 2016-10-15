@@ -4,7 +4,6 @@
     <input type="submit" value="Send" />
 </form>
 
-
 <br><hr><br>
 {% if document_list %}
     <ul>
@@ -15,7 +14,3 @@
 {% else %}
     <p>No documents are available.</p>
 {% endif %}
-
-{% comment "Optional note" %}
- {% url 'upload:index' doc.id %}
-{% endcomment %}

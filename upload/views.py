@@ -27,8 +27,8 @@ def pdf_view(request, document_id):
     return FileResponse(open(document_id, 'rb'), content_type='application/pdf')
 
 def reindex_files(request):
-    reindexThread = AnalyzeThread()
-    reindexThread.start()
+    analyzeThread = AnalyzeThread('')
+    analyzeThread.start()
     return HttpResponseRedirect(reverse('upload:index'));
     
 class UploadView(FormView):
