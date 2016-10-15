@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'rest_framework',
     'dictionary.apps.DictionaryConfig',
     'upload.apps.UploadConfig',
     'polls.apps.PollsConfig',
