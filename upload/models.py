@@ -11,7 +11,8 @@ class Attachment(models.Model):
     tags = models.ManyToManyField(MedicalTerm)
     
     def __str__(self):
-        return 'File: %s, Uploaded %s' % (str(self.file_attached).split('/')[-1], str(self.visit_date))
+        # str(self.file_attached).split('/')[-1]
+        return u'%s : %s' % (str(self.visit_date), ' '.join(sorted([x.name for x in self.tags.all()])[:20] ))
 
     
 
