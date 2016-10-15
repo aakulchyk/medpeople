@@ -6,7 +6,8 @@ from django.urls import reverse
 
 from django.http import HttpResponse, HttpResponseRedirect
 
-from .ocr import OcrThread, ReindexThread
+from .ocr import OcrThread
+from .analyze import AnalyzeThread
 
 from django.http import FileResponse
 
@@ -26,7 +27,7 @@ def pdf_view(request, document_id):
     return FileResponse(open(document_id, 'rb'), content_type='application/pdf')
 
 def reindex_files(request):
-    reindexThread = ReindexThread()
+    reindexThread = AnalyzeThread()
     reindexThread.start()
     return HttpResponseRedirect(reverse('upload:index'));
     
