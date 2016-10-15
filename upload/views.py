@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from django.http import HttpResponse, HttpResponseRedirect
 
-from .ocrtest import OcrThread, ReindexThread
+from .ocr import OcrThread, ReindexThread
 
 from django.http import FileResponse
 
