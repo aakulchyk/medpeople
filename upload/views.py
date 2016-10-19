@@ -6,6 +6,9 @@ from django.urls import reverse
 
 from django.http import HttpResponse, HttpResponseRedirect
 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 from .ocr import OcrThread
 from .analyze import AnalyzeThread
 
@@ -13,6 +16,7 @@ from django.http import FileResponse
 
 pending_pdfs_list = []
 
+@login_required
 def done(request):
     l = pending_pdfs_list[:]
     print('list!' + str(l))
@@ -22,22 +26,26 @@ def done(request):
     template_name = 'upload/done.html'
     initial = {'file_list_string' : ','.join(l)}    
     return render(request, template_name, initial)
-    
+   
+@login_required  
 def pdf_view(request, document_id):
     return FileResponse(open(document_id, 'rb'), content_type='application/pdf')
 
+@login_required
 def reindex_files(request):
     analyzeThread = AnalyzeThread('')
     analyzeThread.start()
     return HttpResponseRedirect(reverse('upload:index'));
-    
-class UploadView(FormView):
+
+class UploadView(LoginRequiredMixin, FormView):
     template_name = 'upload/form.html'
     form_class = UploadForm
     success_url = 'done/'
     
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {'form': self.form_class, 'document_list' : Attachment.objects.order_by('-visit_date')[:20]})
+        print(request.session)
+        objects = Attachment.objects.filter(user = request.user)
+        return render(request, self.template_name, {'form': self.form_class, 'document_list' : objects.order_by('-visit_date')[:20]})
     
     def form_valid(self, form):
         for each in form.cleaned_data['attachments']:

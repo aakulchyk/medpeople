@@ -3,12 +3,15 @@ from django.db import models
 from django.utils import timezone
 
 from dictionary.models import MedicalTerm
+from django.contrib.auth.models import User
 
+# test p12345678
 class Attachment(models.Model):
     file_attached = models.FileField(upload_to='attachments')
     all_content = models.TextField()
     visit_date = models.DateField(default=timezone.now())
     tags = models.ManyToManyField(MedicalTerm)
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
     
     def __str__(self):
         # str(self.file_attached).split('/')[-1]
