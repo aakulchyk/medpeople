@@ -43,7 +43,7 @@ class UploadView(LoginRequiredMixin, FormView):
     success_url = 'done/'
     
     def get(self, request, *args, **kwargs):
-        print(request.session)
+        self.request = request
         objects = Attachment.objects.filter(user = request.user)
         return render(request, self.template_name, {'form': self.form_class, 'document_list' : objects.order_by('-visit_date')[:20]})
     
@@ -52,7 +52,7 @@ class UploadView(LoginRequiredMixin, FormView):
             file_path = 'attachments/' + each.name
             # if no documents with this name
             if (not Attachment.objects.filter(file_attached=file_path)):
-                Attachment.objects.create(file_attached=each)
+                Attachment.objects.create(file_attached=each, user = self.request.user)
                 pending_pdfs_list.append(file_path)
             else:
                 print(file_path + ' exists!')
