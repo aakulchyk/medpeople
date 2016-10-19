@@ -8,7 +8,11 @@
 {% if document_list %}
     <ul>
     {% for doc in document_list %}
-        <li><a href="{% url 'upload:view' doc.file_attached %}">{{ doc }}</a></li>
+        {% if doc.file_attached %}
+            <li><a href="{% url 'upload:view' doc.file_attached %}">{{ doc }}</a></li>
+        {% else %}
+            <li>{{doc}}</li>
+        {% endif %}
     {% endfor %}
     </ul>
 {% else %}
