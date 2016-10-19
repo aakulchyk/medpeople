@@ -1,3 +1,20 @@
+# pip3 install django-rest-framework
+
 from django.shortcuts import render
 
-# Create your views here.
+from django.contrib.auth.models import User, Group
+from dictionary.models import MedicalTerm
+from upload.models import Attachment
+
+from rest_framework import viewsets
+from .serializers import DocumentListSerializer
+
+class DocumentListViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Attachment.objects.all().order_by('-visit_date')
+    serializer_class = DocumentListSerializer
+
+    
+

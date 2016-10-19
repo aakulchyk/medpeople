@@ -50,7 +50,3 @@ class UploadView(FormView):
                 print(file_path + ' exists!')
 
         return super(UploadView, self).form_valid(form)
-        
-    
-
-

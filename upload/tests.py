@@ -1,10 +1,15 @@
 from django.test import TestCase
 from django.urls import reverse
 
+from django.db import models
 from .models import Attachment
 
 class UploadViewTests(TestCase):
     
+    def test_done_view(self):
+        response = self.client.get(reverse('upload:done'))
+        self.assertEqual(response.status_code, 200)
+        
     def test_index_view_no_documents(self):
         response = self.client.get(reverse('upload:index'))
         self.assertEqual(response.status_code, 200)
@@ -12,5 +17,10 @@ class UploadViewTests(TestCase):
         self.assertQuerysetEqual(response.context['document_list'], [])
     
     def test_index_view_one_document(self):
-        Attachment.objects.create(file_attached="example.pdf")
+        obj = Attachment.objects.create()
+        obj.save()
         response = self.client.get(reverse('upload:index'))
+        self.assertEqual(response.status_code, 200)
+        #self.assertQuerysetEqual(response.context['document_list'], [])
+        
+        
