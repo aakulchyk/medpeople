@@ -3,7 +3,9 @@ from .models import Attachment
 from dictionary.models import MedicalTerm
 from enum import Enum
 
+# pip3 install datefinder
 import pymorphy2
+import datefinder
 
 class FilterType(Enum):
     exact = 1
@@ -29,11 +31,12 @@ class AnalyzeThread(Thread):
         self.tags_added = 0
         print('started analysis of document %s' % doc)
         for line in doc.all_content.split('\n'):
-            self.analyze_line(doc, line)
+            self.search_for_tags(doc, line)
         print('document %s is analyzed. %d new tags added.' % (doc, self.tags_added))
         
-    
-    def analyze_line(self, doc, line):
+
+    ######## tag searching methods #############    
+    def search_for_tags(self, doc, line):
         splitted_line = line.split(' ');
         for idx, word in enumerate(splitted_line):
             stripped_word = word.strip()
@@ -86,3 +89,7 @@ class AnalyzeThread(Thread):
             doc.tags.add(tag)
         else:
             print(u'Tag %s exists' % tag )
+
+    ####### date searching methods ###############
+    def search_for_date(self, line):
+        matches = datefinder.find_dates(string_with_dates)
