@@ -18,9 +18,9 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
+    url(r'^',include('upload.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^login/$', auth_views.login, {'template_name': 'upload/login.html'}, name='login'),
-    url(r'^upload/',include('upload.urls')),
     url(r'^dictionary/',include('dictionary.urls')),
     url(r'^api/', include('api.urls', namespace='rest_framework')),
 ]
