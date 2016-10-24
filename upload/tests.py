@@ -13,7 +13,6 @@ class UploadViewTests(TestCase):
     def test_index_view_no_documents(self):
         response = self.client.get(reverse('upload:index'))
         self.assertEqual(response.status_code, 200)
-        #self.assertContains(response, "No polls are available.")
         self.assertQuerysetEqual(response.context['document_list'], [])
     
     def test_index_view_one_document(self):
@@ -21,6 +20,6 @@ class UploadViewTests(TestCase):
         obj.save()
         response = self.client.get(reverse('upload:index'))
         self.assertEqual(response.status_code, 200)
-        #self.assertQuerysetEqual(response.context['document_list'], [])
+
         
         
