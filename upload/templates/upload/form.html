@@ -18,3 +18,8 @@
 {% else %}
     <p>No documents are available.</p>
 {% endif %}
+<hr>
+<form action="{% url 'upload:logout' %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Logout">
+</form>

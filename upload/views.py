@@ -8,6 +8,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import logout
 
 from .ocr import OcrThread
 from .analyze import AnalyzeThread
@@ -37,6 +38,10 @@ def reindex_files(request):
     analyzeThread.start()
     return HttpResponseRedirect(reverse('upload:index'));
 
+def logout_user(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('upload:index'));
+    
 class UploadView(LoginRequiredMixin, FormView):
     template_name = 'upload/form.html'
     form_class = UploadForm
