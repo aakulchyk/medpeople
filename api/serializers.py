@@ -7,10 +7,11 @@ from rest_framework import serializers
 
 class DocumentListSerializer(serializers.HyperlinkedModelSerializer):
     tags = serializers.StringRelatedField(many=True)
+    user = serializers.StringRelatedField()
     
     class Meta:
         model = Attachment
-        fields = ('file_attached','visit_date', 'tags')
+        fields = ('file_attached','visit_date', 'tags', 'user')
 
 '''
 class GroupSerializer(serializers.HyperlinkedModelSerializer):

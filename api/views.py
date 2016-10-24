@@ -13,7 +13,7 @@ class DocumentListViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    queryset = Attachment.objects.all().order_by('-visit_date')
+    queryset = Attachment.objects.all().order_by('-visit_date')[:20]
     serializer_class = DocumentListSerializer
 
     
