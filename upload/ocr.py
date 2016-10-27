@@ -12,9 +12,12 @@ import pyocr
 import pyocr.builders
 import io	
 
+from time import sleep
+
 def pdf_ocr(pdf_filename):
     # TEMP!
-    #return u'PSEUDO-RECOGNIZED TEXT'
+    sleep(5)
+    return u'PSEUDO-RECOGNIZED TEXT'
 
     tool = pyocr.get_available_tools()[0]
 

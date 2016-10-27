@@ -18,8 +18,8 @@ class Attachment(models.Model):
 
         tags = ' '.join(sorted(['['+x.name+']' for x in self.tags.all()])[:20])
         if not tags:
-            tags = u'Какие-то каракули'
-        description = tags if self.file_attached else u'Файл не загружен'
+            tags = u'Cannot recognize text'
+        description = tags if self.file_attached else u'File not loaded'
         return u'%s : %s' % (str(self.visit_date), description)
 
     
