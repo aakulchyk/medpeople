@@ -38,20 +38,18 @@ class AnalyzeThread(Thread):
         
         print('started analysis of document %s' % doc)
         for line in doc.all_content.split('\n'):
-            tags = self.search_for_tags(doc, line)
+            tags = self.search_for_tags(line)
             doc_data['tags'].append(tags)
         
         self.extracted_data[doc] = doc_data
         print('document %s is analyzed. %d new tags added.' % (doc, self.tags_added))
         
-
     ######## tag searching methods #############    
-    def search_for_tags(self, doc, line):
+    def search_for_tags(self, line):
         tags = []
         splitted_line = line.split(' ');
         for idx, word in enumerate(splitted_line):
             stripped_word = word.strip()
-            
             # try to find collocations (2+ words):
             objlist = self.filter(stripped_word, FilterType.startswith)
             for curr_term in objlist:
@@ -66,14 +64,14 @@ class AnalyzeThread(Thread):
             # try to find complete match
             if self.filter(stripped_word, FilterType.exact):
                 term = self.get(stripped_word, FilterType.exact)
-                tags.append(curr_term)
+                tags.append(term)
                 continue
                     
             # try to find match with normalized word form
             word_norm = self.normalized(stripped_word)
             if self.filter(word_norm, FilterType.exact):
                 term = self.get(word_norm, FilterType.exact)
-                tags.append(curr_term)
+                tags.append(term)
                 continue
         return tags
     
