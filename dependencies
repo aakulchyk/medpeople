@@ -1,0 +1,23 @@
+#/bin/sh
+
+# prequesite: sudo apt-get install python3-pip
+sudo pip3 install django
+sudo pip3 install djangorestframework
+sudo pip3 install django-multiupload
+sudo pip3 install wand 
+sudo pip3 install pyocr 
+sudo pip3 install pymorphy2  
+sudo pip3 install datefinder
+
+sudo pip3 install PyPDF2
+
+sudo apt-get install tesseract-ocr
+sudo apt-get install tesseract-ocr-rus
+
+python3 manage.py makemigrations
+python3 manage.py migrate
+python3 manage.py createsuperuser
+
+
+
+
