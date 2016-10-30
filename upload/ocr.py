@@ -6,53 +6,47 @@
 
 import sys
 
-from wand.image import Image
+#from wand.image import Image
 from PIL import Image as PI
 import pyocr
 import pyocr.builders
 import io	
-
 from time import sleep
+import re
+
+from subprocess import run
+import os
+
+tmpPath = '/dev/shm/'
+imgformat = 'png'
+
+languages = ['rus','eng']
 
 def pdf_ocr(pdf_filename):
-    # TEMP!
-    sleep(5)
-    return u'PSEUDO-RECOGNIZED TEXT'
-
     tool = pyocr.get_available_tools()[0]
 
-    if not 'rus' in tool.get_available_languages():
-        return 'Russian language is not supported'
+    for lang in languages:
+        if not lang in tool.get_available_languages():
+            return lang + ' language is not supported'
 
-    lang = 'rus'
-    print('lang: %s' % lang)
-
-    req_image = []
-    final_text = []
-
-    print('open file: %s' % pdf_filename)
-    try:
-        image_pdf = Image(filename=pdf_filename, resolution=300)
-    except:
-        print('Exception ', sys.exc_info()[0])
-        raise
-    print('convert pdf')
-    image_jpeg = image_pdf.convert('jpeg')
-
-    for idx, img in enumerate(image_jpeg.sequence):
-        print('convert page %d' % idx )
-        img_page = Image(image=img)
-        req_image.append(img_page.make_blob('jpeg'))
-
-    for idx, img in enumerate(req_image): 
-        print('OCR page %d' % idx)
-        txt = tool.image_to_string(
-            PI.open(io.BytesIO(img)),
-            lang=lang,
-            builder=pyocr.builders.TextBuilder()
-        )
-        final_text.append(txt)
+    run(['python','upload/pdftoimg.py', pdf_filename])
     
+    final_text = []
+    fname = pdf_filename.split('/')[-1]
+    fname = fname.replace('.','\.')
+    pattern = re.compile('%s_\d+\.%s' % (fname, imgformat))
+    for root, dirs, files in os.walk(tmpPath):
+        for currName in files:
+            if pattern.match(currName):
+                for lang in languages:
+                    txt = tool.image_to_string(
+                        PI.open(tmpPath + currName),
+                        lang=lang,
+                        builder=pyocr.builders.TextBuilder()
+                    )
+                    final_text.append(txt)
+                os.remove(tmpPath + currName)
+                
     return final_text
 
 
@@ -60,7 +54,6 @@ def pdf_ocr(pdf_filename):
 from threading import Thread
 
 from .models import Attachment
-import re
 
 from .analyze import AnalyzeThread
 
@@ -72,19 +65,31 @@ class OcrThread(Thread):
     def run(self):
         while self.pdflist:
             pdf_file = self.pdflist.pop(0)
-            print(pdf_file)
+            
             recognized_text = pdf_ocr(pdf_file)
-            f = open(pdf_file + '.text', 'w')
-            text = ''.join(recognized_text)
-            words = re.findall(u'(.+)', text)
-            newtext = '\n'.join(words)
-            f.write(newtext)
-            f.close()
-            #put text to DB
-            obj = Attachment.objects.get(file_attached=pdf_file)
-            obj.all_content = newtext
-            obj.save()
+            newtext = self.extractAllWordsFromText(recognized_text)
+            
+            self.saveTextToDB(pdf_file, newtext)
+            self.saveWordsToFile(pdf_file+'.text', newtext)
+            
             analyzeThread = AnalyzeThread(pdf_file)
             analyzeThread.start()
-        print('All files OCR\'d')
+        print('All files OCR\'ed')
+    
+    def extractAllWordsFromText(self, recognizedText):
+        text = ''.join(recognizedText)
+        words = re.findall(u'(\w+)', text)
+        newtext = '\n'.join(words)
+        return newtext
         
+    def saveWordsToFile(self, pdf_file, text):
+        f = open(pdf_file, 'w')
+        f.write(text)
+        f.close()
+
+    def saveTextToDB(self, pdf_file, text):
+        obj = Attachment.objects.get(file_attached=pdf_file)
+        obj.all_content = text
+        obj.save()
+        
+           

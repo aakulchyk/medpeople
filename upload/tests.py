@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.test import TestCase, Client
 from django.urls import reverse
 
@@ -5,6 +6,7 @@ from django.contrib.auth.models import User
 
 from django.db import models
 from .models import Attachment
+
 
 class UploadViewTests(TestCase):
     @classmethod
@@ -44,11 +46,27 @@ class UploadViewTests(TestCase):
         pass
 
 
+from upload.ocr import pdf_ocr
+from upload.ocr import OcrThread
+
+class OcrTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.filename = 'attachments/test.pdf'
+        cls.thread = OcrThread([])
+    
+    def test_ocr(self):
+        text = pdf_ocr(self.filename)
+    
+    def test_extract(self):
+        text = u'((((($$$$))\nкровь \\\\ \n (кишки) !@#$%^&&*()\n\n\nрадость'
+        newtext = self.thread.extractAllWordsFromText(text)
+        self.assertEqual(newtext, u'кровь\nкишки\nрадость')
+
 
 
 from upload.analyze import AnalyzeThread
 from dictionary.models import MedicalTerm
-
     
 class AnalyzerTests(TestCase):
     @classmethod
