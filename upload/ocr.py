@@ -13,7 +13,7 @@ from subprocess import run
 import os
 
 from threading import Thread
-from .models import Attachment
+from .models import Document
 from .analyze import AnalyzeThread
 
 tmpPath = '/dev/shm/'
@@ -81,6 +81,6 @@ class OcrThread(Thread):
         f.close()
 
     def saveTextToDB(self, pdf_file, text):
-        obj = Attachment.objects.get(file_attached=pdf_file)
+        obj = Document.objects.get(file_attached=pdf_file)
         obj.all_content = text
         obj.save()
