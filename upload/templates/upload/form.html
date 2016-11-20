@@ -3,8 +3,11 @@
     {{ form.as_p }}
     <input type="submit" value="Send" />
 </form>
-
 <br><hr><br>
+<form action = "" method="get">
+  <input type="text" name="filters" value = {{ request.GET.filters }}>
+    <input type="submit" value="Filter by tags">
+</form>
 {% if document_list %}
     <ul>
     {% for doc in document_list %}
