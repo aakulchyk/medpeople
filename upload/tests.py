@@ -44,7 +44,6 @@ class UploadViewTests(TestCase):
         pass
 
 
-
 class OcrTests(TestCase):
 
     @classmethod
@@ -53,7 +52,7 @@ class OcrTests(TestCase):
         cls.thread = OcrThread([])
 
     def test_ocr(self):
-        text = pdf_ocr(self.filename)
+        pdf_ocr(self.filename)
 
     def test_extract(self):
         text = u'((((($$$$))\nкровь \\\\ \n (кишки) !@#$%^&&*()\n\n\nрадость'
@@ -66,13 +65,13 @@ class AnalyzerTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create()
-        cls.doc = Document.objects.create(user = cls.user)
+        cls.doc = Document.objects.create(user=cls.user)
         cls.thread = AnalyzeThread(cls.doc)
 
     def test_search_tags(self):
-        term1 = MedicalTerm.objects.create(name = u'кровь')
-        term2 = MedicalTerm.objects.create(name = u'молоко')
-        term3 = MedicalTerm.objects.create(name = u'диарея')
+        term1 = MedicalTerm.objects.create(name=u'кровь')
+        term2 = MedicalTerm.objects.create(name=u'молоко')
+        term3 = MedicalTerm.objects.create(name=u'диарея')
         tags = self.thread.search_for_tags('test test test кровь c молоком и кишки testtest')
         self.assertEqual(term1 in tags, True)
         self.assertEqual(term2 in tags, True)
