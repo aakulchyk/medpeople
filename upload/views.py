@@ -53,20 +53,13 @@ class UploadView(LoginRequiredMixin, FormView):
     form_class = UploadForm
     success_url = 'done/'
 
-    def strip_filters(self, filter_names):
-        filters = []
-        for f in filter_names:
-            for found in MedicalTerm.objects.filter(name=f):
-                filters.append(found)
-        if not filters:
-            filters.append(MedicalTerm())
-        return filters
 
     def get(self, request, *args, **kwargs):
         self.request = request
         query = Document.objects.filter(user=request.user)
         if request.GET.get("filters"):
-            filters = self.strip_filters(request.GET["filters"].split(','))
+            names = request.GET["filters"].split(',')
+            filters = MedicalTerm.objectsByNames(names)
             for f in filters:
                 query = query.filter(tags=f)
 
