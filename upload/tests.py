@@ -39,16 +39,10 @@ class UploadViewTests(TestCase):
         f.close()
 
         self.assertEqual(response.status_code, 200)
-        #print(Document.objects.all())
 
     def test_index_view_one_document(self):
         pass
 
-    def test_get_filters_by_names(self):
-        names = ['кровь','молоко']
-        term1 = MedicalTerm.objects.create(name = u'кровь')
-        term2 = MedicalTerm.objects.create(name = u'молоко')
-        pass
 
 
 class OcrTests(TestCase):
