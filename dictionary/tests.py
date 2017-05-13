@@ -1,5 +1,6 @@
 from django.test import TestCase
 from dictionary.models import MedicalTerm
+from dictionary.models import DocumentType
 
 
 class MedicalTermTests(TestCase):
@@ -17,3 +18,21 @@ class MedicalTermTests(TestCase):
         names = ['кровь', 'молоко']
         self.assertEqual(MedicalTerm.objectsByNames(names),
                          [self.terms[0], self.terms[1]])
+
+
+class DocumentTypeTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.t = DocumentType.objects.create()
+        cls.tt = DocumentType.objects.create(
+            type = DocumentType.SYNEVO_ANALYSIS_TABLE
+        )
+
+    def defaultTypeTest(self):
+        self.assertEqual(self.t, DocumentType.COMMON_RECIPE, True)
+        self.assertEqual(self.t, DocumentType.COMMON_DIAGNOSIS, False)
+
+    def isTableTest(self):
+        self.assertEqual(self.t.isTable(), False)
+        self.assertEqual(self.tt.isTable(), True)
+

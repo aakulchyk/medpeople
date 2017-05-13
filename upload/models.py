@@ -16,7 +16,7 @@ class Document(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
     doc_type = models.ForeignKey(DocumentType,
                                  on_delete=models.CASCADE,
-                                 default=0)
+                                 default=DocumentType.COMMON_RECIPE)
 
     def get_absolute_url(self):
         return reverse('upload.pdf_view', args=[self.file_attached])

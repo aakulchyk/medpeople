@@ -8,44 +8,8 @@ import pymorphy2
 import datefinder
 
 
-class FilterType(Enum):
-    exact = 1
-    startswith = 2
-
-
-class AnalyzeThread(Thread):
-
+class TextAnalyzer:
     morph = pymorphy2.MorphAnalyzer()
-    tags_added = 0
-    extracted_data = {}
-
-    def __init__(self, document):
-        Thread.__init__(self)
-        self.document = document
-
-    def run(self):
-        if self.document:
-            doc = Document.objects.get(file_attached = self.document)
-            self.analyze_document(doc)
-        else:
-            documents = Document.objects.all();
-            for doc in documents:
-                self.analyze_document(doc)
-
-        self.save_all_extracted_data_to_model()
-
-    def analyze_document(self, doc):
-        self.tags_added = 0
-        doc_data = {}
-        doc_data['tags'] = []
-
-        print('started analysis of document %s' % doc)
-        for line in doc.all_content.split('\n'):
-            tags = self.search_for_tags(line)
-            doc_data['tags'] += tags
-
-        self.extracted_data[doc] = doc_data
-        print('document %s is analyzed. %d new tags added.' % (doc, self.tags_added))
 
     ######## tag searching methods #############
     def search_for_tags(self, line):
@@ -96,7 +60,52 @@ class AnalyzeThread(Thread):
 
     ####### date searching methods ###############
     def search_for_date(self, line):
-        matches = datefinder.find_dates(line)
+        #matches = datefinder.find_dates(line)
+        pass
+
+
+##############################################################
+#########################   THREAD  ##########################
+##############################################################
+
+class FilterType(Enum):
+    exact = 1
+    startswith = 2
+
+
+class AnalyzeThread(Thread):
+
+    tags_added = 0
+    extracted_data = {}
+    analyzer = TextAnalyzer()
+
+    def __init__(self, document):
+        Thread.__init__(self)
+        self.document = document
+
+    def run(self):
+        if self.document:
+            doc = Document.objects.get(file_attached = self.document)
+            self.analyze_document(doc)
+        else:
+            documents = Document.objects.all();
+            for doc in documents:
+                self.analyze_document(doc)
+
+        self.save_all_extracted_data_to_model()
+
+    def analyze_document(self, doc):
+        self.tags_added = 0
+        doc_data = {}
+        doc_data['tags'] = []
+
+        print('started analysis of document %s' % doc)
+        for line in doc.all_content.split('\n'):
+            tags = self.analyzer.search_for_tags(line)
+            doc_data['tags'] += tags
+
+        self.extracted_data[doc] = doc_data
+        print('document %s is analyzed. %d new tags added.' % (doc, self.tags_added))
 
     ####### save to model ########################
     def save_all_extracted_data_to_model(self):
@@ -113,3 +122,6 @@ class AnalyzeThread(Thread):
 
     def save_date_to_model(sel):
         pass
+
+
+

@@ -19,68 +19,86 @@ from .analyze import AnalyzeThread
 tmpPath = '/dev/shm/'
 imgformat = 'png'
 
-languages = ['rus', 'eng']
+langs = ['rus', 'eng']
 
 
-def pdf_ocr(pdf_filename):
-    tool = pyocr.get_available_tools()[0]
+class OCR:
 
-    for lang in languages:
-        if lang not in tool.get_available_languages():
-            return lang + ' language is not supported'
+    def __init__(self):
+        self.tool = pyocr.get_available_tools()[0]
+        # remove not supported languages
+        get_langs = self.tool.get_available_languages
+        self.langs = [l for l in langs if l in get_langs()]
+        assert(len(self.langs) > 0)
 
-    run(['python', 'upload/pdftoimg.py', pdf_filename])
+    def _convertPdfToImg(self,filename):
+        run(['python', 'upload/pdftoimg.py', filename])
 
-    final_text = []
-    fname = pdf_filename.split('/')[-1]
-    fname = fname.replace('.', '\.')
-    pattern = re.compile('%s_\d+\.%s' % (fname, imgformat))
-    for root, dirs, files in os.walk(tmpPath):
-        for currName in files:
-            if pattern.match(currName):
-                for lang in languages:
-                    txt = tool.image_to_string(
-                        PI.open(tmpPath + currName),
-                        lang=lang,
-                        builder=pyocr.builders.TextBuilder()
-                    )
-                    final_text.append(txt)
-                os.remove(tmpPath + currName)
+    def _extractTextInOneLang(self, fullpath, lang):
+        assert(os.path.exists(fullpath))
+        return self.tool.image_to_string(
+            PI.open(fullpath),
+            lang=lang,
+            builder=pyocr.builders.TextBuilder()
+        )
 
-    return final_text
+    def _findDocumentImageFiles(self, pdf_filename):
+        foundImages = []
+        fname = pdf_filename.split('/')[-1]
+        fname = fname.replace('.', '\.')
+        pattern = re.compile('%s_\d+\.%s' % (fname, imgformat))
+        for root, dirs, files in os.walk(tmpPath):
+            foundImages.extend( [f for f in files if pattern.match(f)] )
+        return foundImages
 
+    def extractAllTextFromPdf(self, pdf_filename):
+        self._convertPdfToImg(pdf_filename)
+        final_text = []
+        for f in self._findDocumentImageFiles(pdf_filename):
+            for l in self.langs:
+                txt = self._extractTextInOneLang(tmpPath+f, l)
+                final_text.append(txt)
+            os.remove(tmpPath+f)
+        return '\n'.join(final_text)
+
+
+#############################################################################
+########################      THREAD       ##################################
+#############################################################################
 
 class OcrThread(Thread):
     def __init__(self, pdflist):
         Thread.__init__(self)
         self.pdflist = pdflist
+        self.ocr = OCR()
 
     def run(self):
         while self.pdflist:
             pdf_file = self.pdflist.pop(0)
 
-            recognized_text = pdf_ocr(pdf_file)
-            newtext = self.extractAllWordsFromText(recognized_text)
+            recognized_text = self.ocr.extractAllTextFromPdf(pdf_file)
+            newtext = self._extractAllWordsFromText(recognized_text)
 
-            self.saveTextToDB(pdf_file, newtext)
-            self.saveWordsToFile(pdf_file+'.text', newtext)
+            self._saveTextToDB(pdf_file, newtext)
+            self._saveWordsToFile(pdf_file+'.text', newtext)
 
             analyzeThread = AnalyzeThread(pdf_file)
             analyzeThread.start()
         print('All files OCR\'ed')
 
-    def extractAllWordsFromText(self, recognizedText):
+    def _extractAllWordsFromText(self, recognizedText):
         text = ''.join(recognizedText)
         words = re.findall(u'(\w+)', text)
         newtext = '\n'.join(words)
         return newtext
 
-    def saveWordsToFile(self, pdf_file, text):
+    def _saveWordsToFile(self, pdf_file, text):
         f = open(pdf_file, 'w')
         f.write(text)
         f.close()
 
-    def saveTextToDB(self, pdf_file, text):
+    def _saveTextToDB(self, pdf_file, text):
+        print(pdf_file)
         obj = Document.objects.get(file_attached=pdf_file)
         obj.all_content = text
         obj.save()
