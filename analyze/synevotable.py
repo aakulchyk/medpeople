@@ -29,7 +29,7 @@ def isBlack(dot):
     return all([x>0x30 for x in dot])
 
 def findHDottedLines(pix, w, h):
-    margin = 70*100/w; # point from where to start searching for line
+    margin = int(70*100/w) # point from where to start searching for line
     w = (w-margin)/4
     hdLines = []
     
